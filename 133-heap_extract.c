@@ -5,47 +5,75 @@
  * @root: Double pointer to the root node of the heap
  * Return: The value stored in the extracted root node, or 0 on failure
  */
+
 int heap_extract(heap_t **root) {
     if (*root == NULL) {
-        return 0;  // Handle empty heap case
+        return 0;
     }
 
-    // Store the root value for return
     int extracted_value = (*root)->n;
 
-    // If single node, free it and set root to NULL
     if ((*root)->left == NULL && (*root)->right == NULL) {
         free(*root);
         *root = NULL;
         return extracted_value;
     }
 
-    // Find last level-order node
     heap_t *last_node = _get_last_level_order_node(*root);
 
-    // Swap root and last node values
     (*root)->n = last_node->n;
 
-    // Remove the last node from the heap
     _remove_last_level_order_node(*root, last_node);
 
-    // Heapify the root to maintain max-heap property
     _heapify_down(*root);
 
     return extracted_value;
 }
 
-// Helper function to find the last level-order node (optional)
-heap_t *_get_last_level_order_node(heap_t *root) {
-    // Implementation removed for brevity (similar to previous example)
+heap_t *_get_last_level_order_node(heap_t *root){
+    heap_t *current = root;
+    while (current->right != NULL) {
+        current = current->right;
+    }
+    return current;
 }
 
-// Helper function to remove the last level-order node (optional)
-void _remove_last_level_order_node(heap_t *root, heap_t *node) {
-    // Implementation removed for brevity (similar to previous example)
+void _remove_last_level_order_node(heap_t *root, heap_t *node){
+    heap_t *parent = root;
+    while (parent->right != NULL && parent->right != node) {
+        parent = parent->right;
+    }
+
+    if (parent->left == node) {
+        parent->left = NULL;
+    } else {
+        parent->right = NULL;
+    }
+
+    free(node);
 }
 
-// Helper function to heapify a node downwards (optional)
-void _heapify_down(heap_t *node) {
-    // Implementation removed for brevity (similar to previous example)
+void _heapify_down(heap_t *node){
+    int largest = node->data;
+    heap_t *largest_node = node;
+
+    heap_t *left = node->left;
+    heap_t *right = node->right;
+
+    if (left != NULL && left->data > largest) {
+        largest = left->data;
+        largest_node = left;
+    }
+
+    if (right != NULL && right->data > largest) {
+        largest = right->data;
+        largest_node = right;
+    }
+
+    if (largest_node != node) {
+        int temp = node->data;
+        node->data = largest_node->data;
+        largest_node->data = temp;
+        _heapify_down(largest_node);
+    }
 }
